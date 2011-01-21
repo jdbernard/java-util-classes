@@ -52,6 +52,8 @@
             classname="org.codehaus.groovy.ant.Groovy"/>
     </target>
 
+    <target name="init"/>
+
     <target name="clean" depends="-init">
         <delete dir="${build.dir}"/>
     </target>
