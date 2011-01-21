@@ -82,4 +82,6 @@ public class SmartConfig {
         }
         save()
     }
+
+    public Set<String> keySet() { return props.keySet() }
 }
