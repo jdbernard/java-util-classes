@@ -59,6 +59,4 @@ public class SmartConfig {
         props."$name" = value.toString()
         save()
     }
-
-    Set<String> keySet() { return this.@props.keySet() }
 }

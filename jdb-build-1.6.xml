@@ -91,6 +91,7 @@
         <propertyfile file="${versioning.file}">
             <entry key="version" value="${new-version}" operation="="
                 type="string"/>
+            <entry key="build.number" value="0" type="int" operation="="/>
         </propertyfile>
     </target>
 
