@@ -2,7 +2,7 @@
 
     <property file="project.properties"/>
 
-    <import file="jdb-build-1.4.xml"/>
+    <import file="jdb-build-1.5.xml"/>
 
     <target name="package" depends="-build-modular">
         <copy

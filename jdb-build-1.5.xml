@@ -3,44 +3,56 @@
 
     <property environment="env"/>
 
-    <!--======== PATHS ========-->
-    <path id="groovy.classpath">
-        <fileset dir="${env.GROOVY_HOME}/lib">
-            <include name="*.jar"/>
-        </fileset>
-    </path>
-
-    <path id="groovy.embeddable">
-        <fileset dir="${env.GROOVY_HOME}/embeddable">
-            <include name="*.jar"/>
-        </fileset>
-    </path>
-
-    <path id="compile-libs">
-        <fileset dir="${build.dir}/lib/compile/jar">
-            <include name="*.jar"/>
-        </fileset>
-    </path>
-
-    <path id="runtime-libs">
-        <fileset dir="${build.dir}/lib/runtime/jar">
-            <include name="*.jar"/>
-        </fileset>
-    </path>
-
     <!--======== INIT TARGETS ========-->
     <target name="-init" depends="-common-init,init"/>
 
     <target name="-common-init">
+        <!-- Set default values for some key properties. Since properties are
+             write once, any value set before this point takes precedence. -->
+
         <property name="versioning.file" value="project.properties"/>
+
+        <property name="src.dir" value="${basedir}/src"/>
+        <property name="build.dir" value="${basedir}/build"/>
+        <property name="lib.dir" value="${basedir}/lib"/>
+        <property name="resources.dir" value="${basedir}/resources"/>
+
+        <!--======== PATHS ========-->
+        <path id="groovy.classpath">
+            <fileset dir="${env.GROOVY_HOME}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+
+        <path id="groovy.embeddable">
+            <fileset dir="${env.GROOVY_HOME}/embeddable">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+
+        <path id="compile-libs">
+            <fileset dir="${build.dir}/lib/compile/jar">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+
+        <path id="runtime-libs">
+            <fileset dir="${build.dir}/lib/runtime/jar">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+
     </target>
 
     <target name="-init-groovy">
         <taskdef name="groovyc" classpathref="groovy.classpath"
             classname="org.codehaus.groovy.ant.Groovyc"/>
+
+        <taskdef name="groovy" classpathref="groovy.classpath"
+            classname="org.codehaus.groovy.ant.Groovy"/>
     </target>
 
-    <target name="clean">
+    <target name="clean" depends="-init">
         <delete dir="${build.dir}"/>
     </target>
 
@@ -50,11 +62,14 @@
     <target name="-lib-ivy" unless="${lib.local}"/>
 
     <target name="-lib-local" if="${lib.local}">
-        <copy todir="${build.dir}/lib/compile/jar">
+        <echo message="Resolving libraries locally."/>
+        <mkdir dir="${build.dir}/lib/compile/jar"/>
+        <mkdir dir="${build.dir}/lib/runtime/jar"/>
+        <copy todir="${build.dir}/lib/compile/jar" failonerror="false">
             <fileset dir="${lib.dir}/compile/jar"/>
         </copy>
 
-        <copy todir="${build.dir}/lib/runtime/jar">
+        <copy todir="${build.dir}/lib/runtime/jar" failonerror="false">
             <fileset dir="${lib.dir}/runtime/jar"/>
         </copy>
     </target>
@@ -79,7 +94,8 @@
 
     <!--======== COMPILATION TARGETS ========-->
     <target name="-compile-groovy" depends="-init,-init-groovy,lib">
-        <groovyc srcdir="${src.dir}" destdir="${build.dir}/main/classes"
+        <mkdir dir="${build.dir}/main/classes"/>
+        <groovyc srcdir="${src.dir}/main" destdir="${build.dir}/main/classes"
             includeAntRuntime="false">
 
             <classpath>
@@ -91,7 +107,8 @@
     </target>
 
     <target name="-compile-java" depends="-init,lib">
-        <javac srcdir="${src.dir}" destdir="${build.dir}/main/classes"
+        <mkdir dir="${build.dir}/main/classes"/>
+        <javac srcdir="${src.dir}/main" destdir="${build.dir}/main/classes"
             includeAntRuntime="false" classpathref="compile-libs"/>
     </target>
 
@@ -99,7 +116,8 @@
 
     <!--======== JUNIT TARGETS ========-->
     <target name="-compile-tests-groovy" depends="-init,compile">
-        <groovyc srcdir="${test.dir}" destdir="${build.dir}/test/classes"
+        <mkdir dir="${build.dir}/test/classes"/>
+        <groovyc srcdir="${src.dir}/test" destdir="${build.dir}/test/classes"
             includeAntRuntime="false">
             
             <classpath>
@@ -111,7 +129,8 @@
     </target>
 
     <target name="-compile-tests-java" depends="-init,compile">
-        <javac srcdir="${test.dir}" destdir="${build.dir}/test/classes"
+        <mkdir dir="${build.dir}/test/classes"/>
+        <javac srcdir="${src.dir}/test" destdir="${build.dir}/test/classes"
             includeAntRuntime="false">
             <classpath>
                 <path refid="compile-libs"/>
@@ -142,13 +161,15 @@
     <!--======== RESOURCES TARGETS ========-->
     
     <target name="resources" depends="-init">
-        <copy todir="${build.dir}/main/classes">
+        <mkdir dir="${build.dir}/main/classes"/>
+        <copy todir="${build.dir}/main/classes" failonerror="false">
             <fileset dir="${resources.dir}/main/"/>
         </copy>
     </target>
 
     <target name="resources-test" depends="-init">
-        <copy todir="${build.dir}/test/classes">
+        <mkdir dir="${build.dir}/test/classes"/>
+        <copy todir="${build.dir}/test/classes" failonerror="false">
             <fileset dir="${resources.dir}/test/"/>
         </copy>
     </target>
