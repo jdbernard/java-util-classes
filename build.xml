@@ -1,0 +1,12 @@
+<project name="JDB Common Utilities" default="package">
+
+    <property file="project.properties"/>
+
+    <import file="jdb-build-1.4.xml"/>
+
+    <target name="package" depends="-build-modular">
+        <copy
+            file="${build.dir}/${name}-${version}.${build.number}.jar"
+            tofile="${build.dir}/${name}-${version}.jar"/>
+    </target>
+</project>
