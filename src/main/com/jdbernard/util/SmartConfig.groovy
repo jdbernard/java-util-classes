@@ -13,9 +13,7 @@ public class SmartConfig {
         this.@file = file
         this.@props = new Properties()
 
-        try { file.withInputStream { is -> this.@props.load(is) } }
-        catch (FileNotFoundException fnfe) {}
-        catch (Exception e) { log.warn("Cannot open config file.", e) }
+        this.load()
     }
 
     public SmartConfig(String filename) {
@@ -24,7 +22,16 @@ public class SmartConfig {
         log.trace("Loading configuration from {}",
             new File(filename).canonicalPath)
     }
-    public save() {
+
+    public synchronized load() {
+        log.trace("Loading configuration from {}", file.canonicalPath)
+
+        try { this.@file.withInputStream { is -> this.@props.load(is) } }
+        catch (FileNotFoundException fnfe) {}
+        catch (Exception e) { log.warn("Cannot open config file.", e) }
+    }
+
+    public synchronized save() {
         log.trace("Saving changes.")
         try {file.withOutputStream { os -> this.@props.store(os, "") } }
         catch (Exception e) { log.warn("Cannot save config file.", e) }
