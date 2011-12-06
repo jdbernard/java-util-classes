@@ -37,15 +37,15 @@ public class SmartConfig {
         catch (Exception e) { log.warn("Cannot save config file.", e) }
     }
 
-    def getProperty(String name) { getProperty(name, "") }
+    def getProperty(String name) { getProperty(name, null) }
 
     def getProperty(String name, Object defVal) {
 
         log.trace("Looking up {}", name)
 
-        def val = props.getProperty(name)
+        def val = props[name]
 
-        if (val == null) {
+        if (val == null && defVal != null) {
             log.trace("Doesn't exists, setting with given default")
 
             val = defVal
@@ -83,9 +83,10 @@ public class SmartConfig {
 
         if (name ==~ /.*([dD]irectory|[dD]ir|[fF]ile)/) {
             log.trace("Interpreting as a file/directory.")
-            props."$name" = value.canonicalPath
+            if (!(value instanceof File)) { value = new File(value) }
+            props[name] = value.canonicalPath
         } else {
-            props."$name" = value.toString()
+            props[name] = value.toString()
         }
         save()
     }
