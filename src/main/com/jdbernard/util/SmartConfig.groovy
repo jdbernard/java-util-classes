@@ -45,11 +45,11 @@ public class SmartConfig {
 
         def val = props[name]
 
-        if (val == null && defVal != null) {
+        if (val == null) {
             log.trace("Doesn't exists, setting with given default")
 
             val = defVal
-            this.setProperty(name, defVal)
+            if (defVal != null) { this.setProperty(name, defVal) }
 
         } else {
 
