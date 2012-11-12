@@ -99,7 +99,7 @@
     <target name="-compile-groovy" depends="-init,-init-groovy,lib">
         <mkdir dir="${build.dir}/main/classes"/>
         <groovyc srcdir="${src.dir}/main" destdir="${build.dir}/main/classes"
-            includeAntRuntime="false">
+            fork="true" includeAntRuntime="false">
 
             <classpath>
                 <path refid="groovy.classpath"/>
