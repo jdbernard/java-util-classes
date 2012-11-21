@@ -8,7 +8,7 @@ public class ExtRobot {
 
     @Delegate Robot robot
 
-    int delayTime
+    int delayTime = 100
 
     public ExtRobot() { robot = new Robot() }
 
@@ -20,10 +20,10 @@ public class ExtRobot {
         }
     }
 
-    public void pressCombination(List keyCodes) {
+    public void pressCombination(int... keyCodes) {
         keyCodes.each { keyCode -> robot.keyPress(keyCode) }
         robot.delay(delayTime)
-        keyCodes.reverse().each { keyCode -> robot.keyRelease(keyCode) }
+        (keyCodes as List).reverse().each { keyCode -> robot.keyRelease(keyCode) }
     }
 
     /**
