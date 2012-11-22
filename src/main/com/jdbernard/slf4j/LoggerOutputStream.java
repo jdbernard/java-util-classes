@@ -68,7 +68,7 @@ public class LoggerOutputStream extends OutputStream {
 
         final byte[] messageBytes = new byte[count];
         System.arraycopy(buffer, 0, messageBytes, 0, count);
-        final String message = new String(messageBytes);
+        final String message = new String(messageBytes).trim();
         synchronized(logger) {
             switch (level) {
                 default:
