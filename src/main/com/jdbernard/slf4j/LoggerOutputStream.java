@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.slf4j.Logger;
 
-public class LoggerOutputStream {
+public class LoggerOutputStream extends OutputStream {
 
     public enum Level { TRACE, DEBUG, INFO, WARN, ERROR }
 
@@ -22,7 +22,8 @@ public class LoggerOutputStream {
 
     public LoggerOutputStream(Logger logger, Level level) {
         this.logger = logger;
-        this.level = level; }
+        this.level = level;
+        buffer = new byte[DEFAULT_BUFFER_LENGTH]; }
 
     /** {@inheritDoc} */
     public void write(final byte[] b, final int offset, final int length)
@@ -31,15 +32,16 @@ public class LoggerOutputStream {
             throw new IOException("The output stream has been closed.");
 
         // Grow the buffer if we will reach the limit.
-        if (count + length >= buffer.length) {
+        if ((count + length) >= buffer.length) {
             final int newLength =
-                Math.max(buffer.length + DEFAULT_BUFFER_LENGTH, count + length);
+                Math.max((buffer.length + DEFAULT_BUFFER_LENGTH), (count +
+                length));
             final byte[] newBuffer = new byte[newLength];
 
             System.arraycopy(buffer, 0, newBuffer, 0, count);
             buffer = newBuffer; }
 
-        System.arraycopy(buffer, count, b, offset, length);
+        System.arraycopy(b, count, buffer, offset, length);
         count += length;
     }
 
