@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ParameterizedSocket {
 
@@ -50,6 +52,7 @@ public class ParameterizedSocket {
     private Socket socket;
     private byte[] buffer;
     private Charset charset;
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     public ParameterizedSocket(Socket socket, int bufferSize) {
         this.socket = socket;
@@ -58,7 +61,8 @@ public class ParameterizedSocket {
 
     public ParameterizedSocket(String ipAddress, int port, int bufferSize)
     throws UnknownHostException, IOException {
-        this(new Socket(ipAddress, port), bufferSize); }
+        this(new Socket(ipAddress, port), bufferSize);
+        log.trace("Opened a socket to {}:{}", ipAddress, port); }
 
     public ParameterizedSocket(Socket socket)
     throws UnknownHostException, IOException { 
@@ -76,12 +80,15 @@ public class ParameterizedSocket {
     public void writeMessage(Message message) throws IOException {
         if (message == null || message.parts.size() == 0) return;
 
+        log.debug("Writing a message: [{}].", message);
         byte[] messageBytes = formatMessage(message);
         socket.getOutputStream().write(messageBytes); }
 
     public Message readMessage() throws IOException {
         List<String> messageList = new ArrayList<String>();
         Map<String, String> namedParameters = new HashMap<String, String>();
+
+        log.trace("Reading a message.");
 
         if (socket.getInputStream().read() != START_TOKEN_BYTE) {
             byte[] errMsg = formatMessage("ERROR", "Invalid command (expected START_TOKEN).");
@@ -135,7 +142,9 @@ public class ParameterizedSocket {
             else namedParameters.put(paramName,
                 new String(buffer, 0, bufIdx, charset)); }
 
-        return new Message(messageList, namedParameters); }
+        Message message = new Message(messageList, namedParameters);
+        log.debug("Message read: [{}].", message);
+        return message; }
 
     protected byte[] formatMessage(String... parts) {
         return formatMessage(new Message(parts)); }

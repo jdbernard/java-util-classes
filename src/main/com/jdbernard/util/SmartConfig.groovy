@@ -71,7 +71,7 @@ public class SmartConfig {
                 log.trace("No known interpretation, casting to type of " +
                     "default argument.")
 
-                val = val.asType(defVal.class)
+                val = val.asType(defVal?.class ?: String)
             }
         }
 
