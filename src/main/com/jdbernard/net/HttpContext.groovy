@@ -1,4 +1,5 @@
-/** @author Jonathan Bernard (jdbernard@gmail.com)
+/** # HTTP Context
+  * @author Jonathan Bernard (jdbernard@gmail.com)
   * @copyright 2013 Jonathan Bernard. */
 package com.jdbernard.net
 
