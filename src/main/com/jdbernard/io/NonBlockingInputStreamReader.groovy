@@ -1,6 +1,6 @@
 package com.jdbernard.io;
 
-public class NonBlockingReader implements Runnable {
+public class NonBlockingInputStreamReader implements Runnable {
 
     private Reader rin
     private LinkedList buffer = []
@@ -16,6 +16,6 @@ public class NonBlockingReader implements Runnable {
     public synchronized String readLine() { return buffer.poll() }
     private synchronized void storeLine(String line) { buffer << line }
 
-    public NonBlockingReader(def sin) {
+    public NonBlockingInputStreamReader(def sin) {
         this.rin = new InputStreamReader(sin) }
 }
