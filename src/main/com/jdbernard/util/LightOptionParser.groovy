@@ -28,11 +28,12 @@ public class LightOptionParser {
             /// Find the definition for this option.
             def optDef = optionDefinitions.find {
                 it.key == foundName || it.value.longName == foundName }
-            def optName = optDef.key
-            optDef = optDef.value
 
             if (!optDef) throw new IllegalArgumentException(
                 "Unrecognized option: '${args[optInfo.idx]}.")
+
+            def optName = optDef.key
+            optDef = optDef.value
 
             /// Remember the option index for later.
             optionArgIndices << optInfo.idx
