@@ -94,6 +94,8 @@ public class HttpContext {
             result.status = line.split(/\s/)[1]
             line = reader.readLine().trim()
 
+            boolean isChunked = false
+
             while(line) {
                 def m = (line =~ /Content-Length: (\d+)/)
                 if (m) bytesExpected = m[0][1] as int
@@ -101,13 +103,43 @@ public class HttpContext {
                 m = (line =~ /Set-Cookie: ([^=]+=[^;]+);.+/)
                 if (m) this.cookie = m[0][1]
 
+                m = (line =~ /Transfer-Encoding: chunked/)
+                if (m) isChunked = true
+
                 result.headers << line
-                line = reader.readLine() }
+                line = reader.readLine().trim() }
 
             if (bytesExpected) {
                 StringBuilder sb = new StringBuilder()
                 for (int i = 0; i < bytesExpected; i++) {
                     sb.append(reader.read() as char) }
+
+                result.responseTime = System.currentTimeMillis() - startTime
+                
+                try { result.content = new JsonSlurper().parseText(sb.toString()) }
+                catch (Exception e) { result.content = sb.toString() } }
+            else if (isChunked) {
+
+                // Read chunks
+                StringBuilder sb = new StringBuilder()
+                while (true) {
+                    line = reader.readLine().trim()
+
+                    if (line == "0") break // end of chunks
+                    // length of this chunk
+                    else bytesExpected = Integer.parseInt(line.split(';')[0], 16)
+
+                    for (int i = 0; i < bytesExpected; i++) {
+                        sb.append(reader.read() as char) }
+
+                    // Read CRLF
+                    reader.readLine() }
+
+                // Read any following headers.
+                line = reader.readLine().trim()
+                while (line) {
+                    result.headers << line
+                    line = reader.readLine().trim() }
 
                 result.responseTime = System.currentTimeMillis() - startTime
                 
