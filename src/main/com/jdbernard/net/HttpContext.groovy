@@ -47,9 +47,9 @@ public class HttpContext {
             message.append("\r\n") }
 
         if (request) {
-            def jsonRequestBuilder = new JsonBuilder(request)
-            String requestBody = jsonRequestBuilder.toString()
+            String requestBody = new JsonBuilder(request).toString()
 
+            message.append("Content-Type: application/json\r\n")
             message.append("Content-Length: ")
             message.append(requestBody.length())
             message.append("\r\n\r\n")
