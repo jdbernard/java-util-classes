@@ -157,7 +157,7 @@ public class HttpContext {
             writer.flush()
 
             def line = reader.readLine().trim()
-            result.status = line.split(/\s/)[1]
+            result.status = line.split(/\s/)[1] as int
             line = reader.readLine().trim()
 
             boolean isChunked = false
