@@ -9,7 +9,10 @@ package com.jdbernard.util
 
 public class LightOptionParser {
 
-    public static def parseOptions(def optionDefinitions, List args) {
+    public static def parseOptions(def optionDefinitions, String[] args) {
+        return parseOptions(optionDefinitions, args as List<String>) }
+
+    public static def parseOptions(def optionDefinitions, List<String> args) {
 
         def returnOpts = [args:[]]
 
