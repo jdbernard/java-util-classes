@@ -9,61 +9,102 @@ package com.jdbernard.util
 
 public class LightOptionParser {
 
-    public static def parseOptions(def optionDefinitions, List args) {
+    public static def parseOptions(def optionDefinitions, String[] args) {
+        return parseOptions(optionDefinitions, args as List<String>) }
 
-        def returnOpts = [:]
-        def foundOpts = [:]
-        def optionArgIndices = []
+    public static def parseOptions(def optionDefinitions, List<String> args) {
 
-        /// Find all the options.
-        args.eachWithIndex { arg, idx ->
-            if (arg.startsWith('--')) foundOpts[arg.substring(2)] = [idx: idx]
-            else if (arg.startsWith('-')) foundOpts[arg.substring(1)] = [idx: idx] }
+        def returnOpts = [args:[]]
 
-        /// Look for option arguments.
-        foundOpts.each { foundName, optInfo ->
+        /// Look through each of the arguments to see if it is an option.
+        /// Note that we are manually advancing the index in the loop.
+        for (int i = 0; i < args.size();) {
 
-            def retVal
+            def retVal = false
+            def optName = false
 
-            /// Find the definition for this option.
-            def optDef = optionDefinitions.find {
-                it.key == foundName || it.value.longName == foundName }
+            if (args[i].startsWith('--')) optName = args[i].substring(2) 
+            else if (args[i].startsWith('-')) optName = args[i].substring(1) 
 
-            if (!optDef) throw new IllegalArgumentException(
-                "Unrecognized option: '${args[optInfo.idx]}.")
+            /// This was recognized as an option, try to find the definition
+            /// and read in any arguments.
+            if (optName) {
 
-            def optName = optDef.key
-            optDef = optDef.value
+                /// Find the definition for this option.
+                def optDef = optionDefinitions.find {
+                    it.key == optName || it.value.longName == optName }
 
-            /// Remember the option index for later.
-            optionArgIndices << optInfo.idx
+                if (!optDef) throw new IllegalArgumentException(
+                    "Unrecognized option: '${args[i]}'.")
 
-            /// If there are no arguments, this is a flag.
-            if ((optDef.arguments ?: 0) == 0) retVal = true
+                optName = optDef.key
+                optDef = optDef.value
 
-            /// Otherwise, read in the arguments
-            if (optDef.arguments && optDef.arguments > 0) {
+                /// If there are no arguments, this is a flag. Set the value
+                /// and advance the index.
+                if ((optDef.arguments ?: 0) == 0) { retVal = true; i++ }
 
-                /// Not enough arguments left
-                if ((optInfo.idx + optDef.arguments) >= args.size()) {
-                    throw new Exception("Option '${args[optInfo.idx]}' " +
-                        "expects ${optDef.arguments} arguments.") }
+                /// If there are a pre-determined number of arguments, read them
+                /// in.
+                else if (optDef.arguments &&
+                         optDef.arguments instanceof Number &&
+                         optDef.arguments > 0) {
 
-                int firstArgIdx = optInfo.idx + 1
+                    retVal = []
 
-                /// Case of only one argument
-                if (optDef.arguments == 1)
-                    retVal = args[firstArgIdx]
-                /// Case of multiple arguments
-                else retVal = args[firstArgIdx..<(firstArgIdx + optDef.arguments)]
+                    /// Not enough arguments left
+                    if ((i + optDef.arguments) >= args.size()) {
+                        throw new Exception("Option '${args[i]}' " +
+                            "expects ${optDef.arguments} arguments.") }
 
-                /// Remember all the option argument indices for later.
-                (firstArgIdx..<(firstArgIdx + optDef.arguments)).each {
-                    optionArgIndices << it }}
+                    /// Advance past the option onto the first argument.
+                    i++
 
-            /// Store the value in the returnOpts map
-            returnOpts[optName] = retVal
-            if (optDef.longName) returnOpts[optDef.longName] = retVal }
+                    /// Copy the arguments
+                    retVal += args[i..<(i + optDef.arguments)]
+
+                    /// Advance the index past end of the arguements
+                    i += optDef.arguments } 
+
+                /// If there are a variable number of arguments, treat all
+                /// arguments until the next argument or the end of options as
+                /// arguments for this option
+                else if (optDef.arguments == 'variable') {
+
+                    retVal = []
+
+                    /// Advance past the option to the first argument
+                    i++
+
+                    /// As long as we have not hit another option or the end of
+                    /// arguments, keep adding arguments to the list for this
+                    /// option.
+                    for(;i < args.size() && !args[i].startsWith('-'); i++)
+                        retVal << args[i] }
+
+                else {
+                    throw new Exception("Invalid number of arguments " +
+                        "defined for option ${optName}. The number of " +
+                        "arguments must be either an integer or the value " +
+                        "'variable'") }
+
+                /// Set the value on the option.
+                if (retVal instanceof Boolean) {
+                    returnOpts[optName] = retVal
+                    if (optDef.longName) returnOpts[optDef.longName] = retVal }
+
+                else {
+                    if (!returnOpts.containsKey(optName))
+                        returnOpts[optName] = []
+                    returnOpts[optName] += retVal
+
+                    if (optDef.longName) {
+                        if (!returnOpts.containsKey(optDef.longName))
+                            returnOpts[optDef.longName] = []
+                        returnOpts[optDef.longName] += retVal } } }
+
+            /// This was not as option, it is an unclaomed argument.
+            else { returnOpts.args << args[i]; i++ } }
 
         /// Check that all required options have been found.
         optionDefinitions.each { optName, optDef ->
@@ -71,17 +112,9 @@ public class LightOptionParser {
             if (optDef.required && 
                /// and it has not been found, by either it's short or long name.
                !(returnOpts[optName] ||
-                (optDef.longName && returnOpts[longName]))) 
+                (optDef.longName && returnOpts[optDef.longName]))) 
                 
                 throw new Exception("Missing required option: '-${optName}'.") }
 
-        /// Remove all the option arguments from the args list and return just
-        /// the non-option arguments.
-        optionArgIndices.sort().reverse().each { args.remove(it) }
-
-        //optionArgIndices = optionArgIndices.collect { args[it] }
-        //args.removeAll(optionArgIndices)
-            
-        returnOpts.args = args
         return returnOpts }
 }

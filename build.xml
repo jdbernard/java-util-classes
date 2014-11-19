@@ -4,7 +4,7 @@
 
     <import file="jdb-build-1.10.xml"/>
 
-    <target name="package" depends="-build-modular">
+    <target name="package" depends="run-tests,-build-modular">
         <copy
             file="${build.dir}/${name}-${version}.${build.number}.jar"
             tofile="${build.dir}/${name}-${version}.jar"/>
