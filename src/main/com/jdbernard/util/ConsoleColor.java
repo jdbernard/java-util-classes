@@ -45,19 +45,16 @@ public class ConsoleColor {
 
     public String toString() {
         String result = "\u001b[";
-        boolean needSemi = false;
 
-        if (bright) {
-            result += "1";
-            needSemi = true; }
+        if (bright) result += "1";
+        else result += "0";
 
         if (fg != null) {
-            if (needSemi) result += ";";
-            result += "3" + Integer.toString(fg.ordinal());
-            needSemi = true; }
+            result += ";";
+            result += "3" + Integer.toString(fg.ordinal()); }
 
         if (bg != null) {
-            if (needSemi) result += ";";
+            result += ";";
             result += "4" + Integer.toString(bg.ordinal()); }
 
         return result + "m";
