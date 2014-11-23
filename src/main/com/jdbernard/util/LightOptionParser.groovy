@@ -1,17 +1,91 @@
 /**
  * # Light Option Parser
  * @author Jonathan Bernard (jdbernard@gmail.com)
+ * @org util.jdbernard.com/LightOptionParser
  *
- * LightOptionParser parses command-line style options.
- * TODO: complete docs.
+ * LightOptionParser is a small utility class which parses command-line style
+ * options.
+ * 
  */
 package com.jdbernard.util
 
+/**
+ * ## Option Definitions
+ * 
+ * LightOptionParser uses a option definition map to define its parsing
+ * behavior. Each entry in the map represents an option that the parser should
+ * recognize. The entry's key is expected to be the short version of the
+ * option, which will be recognized when preceded by one hyphen. The value for
+ * the entry is another map containing the detailed definition of that option.
+ *
+ * Valid values for an option definition map are:
+ *
+ * longName
+ * :   The long version of the option name. This is recognized by the parser
+ *     when preceded by two hyphens (`longName: 'help'` corresponds to `--help`
+ *     for example). There is no default for this value. If it is not given
+ *     then the parser will not recognize this option by any long name.
+ *
+ * required
+ * :   A boolean value indicating whether the parser should require that this
+ *     option be present when parsing a set of arguments. This value defaults
+ *     to false.
+ *
+ * arguments
+ * :   A value representing the number of arguments this option is expected to
+ *     take. This can be an integer represening a fixed number of arguments or
+ *     the string value `variable`. If `variable` is given the parser will
+ *     associate every subsequent argument with this option until it encounters
+ *     another option or runs out of arguments. If this value is given ant is
+ *     not either an integer or the string `variable` then an Exception will be
+ *     thrown. This value defaults to 0.
+ *
+ * Here is an example of an option definitions map:
+ *
+ *     def optDefs = [
+ *         'h': [longName: 'help'],
+ *         'v': [longName: 'version'],
+ *         'd': [longName: 'working-dir', arguments: 1],
+ *         'p': [longName: 'file-patterns', arguments: variable, required:
+ *               true] 
+ *     ]
+ */
 public class LightOptionParser {
 
     public static def parseOptions(def optionDefinitions, String[] args) {
         return parseOptions(optionDefinitions, args as List<String>) }
 
+    /**
+     * ### parseOptions
+     * Parse a set of arguments according to a given a map of option
+     * definitions. This will return a map of options found in the given
+     * arguments. Each entry in this map represents an option that was found.
+     * The key will be the option name. If the option takes arguments then the
+     * value will be an array of the arguments found. For the sake of
+     * consistency this will always be an array, even if the option takes only
+     * one argument. If the option takes no arguments, the value will be
+     * `true`.
+     *
+     * If a found option was defined with a long name then the returned map
+     * will have entries for both the short and long names of the option. The
+     * values of these entries will be identical.
+     *
+     * If an option is defined with a fixed number of *n* arguments then the
+     * parser will treat the next *n* arguments following the option as
+     * arguments to that option, regardless of their value. For example, if I
+     * define an option `arg2` that takes 2 arguments and pass 
+     * `--arg2 first -f` as arguments, the `-f` will be taken as the second
+     * argument to the `arg2` option, not a separate option.
+     *
+     * This method throws an IllegalArgumentException when an option is found
+     * that does not match any of the given option definitions.
+     *
+     * This method throws an Exception if an option requires more arguments
+     * than are remaining or an option that is defined as required is not
+     * present.
+     *
+     * @org util.jdbernard.com/LightOptionParser/parseOptions
+     */
     public static def parseOptions(def optionDefinitions, List<String> args) {
 
         def returnOpts = [args:[]]

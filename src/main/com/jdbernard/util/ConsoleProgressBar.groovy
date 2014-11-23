@@ -3,7 +3,7 @@ package com.jdbernard.util
 /**
  * Controls a console-based progress bar.
  * This bar has two totals, an overall process total and an individual file
- * total. The overall total is 0-based, b/c the current value is incomplete
+ * total. The overall total is 0-based because the current value is incomplete
  * (the file counter is the partial completion of the current step). The file
  * counter is 1-based because the current step is complete for this counter.
  * @author Jonathan Bernard (jonathan.bernard@gemalto.com)
