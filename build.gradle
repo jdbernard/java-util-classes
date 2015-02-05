@@ -1,0 +1,17 @@
+apply plugin: "groovy"
+apply plugin: "maven"
+
+group = "com.jdbernard"
+version = "3.4"
+
+repositories {
+    mavenCentral() }
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
+    compile 'org.slf4j:slf4j-api:1.7.10'
+    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+
+    testCompile 'junit:junit:4.12'
+}
