@@ -102,7 +102,9 @@ public class HttpContext {
             message.append(requestBody)
 
             message.append("\r\n") }
-        else message.append("\r\n")
+        else if (method == "POST") {
+			message.append("Content-Length: 0\r\n\r\n") }
+		else message.append("\r\n")
 
         return message.toString()
     }
