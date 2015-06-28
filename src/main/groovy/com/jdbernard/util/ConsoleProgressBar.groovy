@@ -42,13 +42,16 @@ class ConsoleProgressBar {
       def remMin = curPercent < 0.05 ? '?' : (int) (remTime / 60)
       def remSec = curPercent < 0.05 ? '?' : (int) (((remTime / 60.0) - remMin) * 60)
 
+      lastInfo = info
+      if (info.length() > 16) info = info[0..<16]
+      if (info.length() < 16) info = info.padRight(16)
+
       out.print '\b' * lastLinePrinted.length()
       lastLinePrinted = '=' * numEq + (curStep > 0 ? "0" : "") + '-' * (MAX_STEP - curStep)
-      lastLinePrinted += " ${info.padRight(16)} -- (" +
+      lastLinePrinted += " ${info} -- (" +
         "${String.format('%5.2f', curPercent * 100)}%, ${remMin ? remMin + 'm ' : ''}${remSec}s)       "
       out.print lastLinePrinted
       lastStepAmount = curStep;
-      lastInfo = info
     }
     out.flush()
   }

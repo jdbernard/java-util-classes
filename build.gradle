@@ -2,7 +2,7 @@ apply plugin: "groovy"
 apply plugin: "maven"
 
 group = "com.jdbernard"
-version = "3.5"
+version = "3.6"
 
 repositories {
     mavenCentral() }
