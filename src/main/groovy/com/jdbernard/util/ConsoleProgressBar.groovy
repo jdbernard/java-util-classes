@@ -18,6 +18,9 @@ class ConsoleProgressBar {
   private String lastInfo = ""
   private long startTime
 
+  public void setMax(int max) {
+    this.max = Math.max(max, 1) }
+
   void update(int value, String info) {
     if (value == 0 || startTime == 0)
         startTime = System.currentTimeMillis()
