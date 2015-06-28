@@ -19,7 +19,8 @@ class ConsoleProgressBar {
   private long startTime
 
   void update(int value, String info) {
-    if (value == 0) startTime = System.currentTimeMillis()
+    if (value == 0 || startTime == 0)
+        startTime = System.currentTimeMillis()
 
     def curStep
     def curPercent
