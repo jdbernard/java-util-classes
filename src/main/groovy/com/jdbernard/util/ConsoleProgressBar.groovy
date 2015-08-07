@@ -11,17 +11,17 @@ package com.jdbernard.util
 class ConsoleProgressBar {
   int MAX_STEP = 30
 
-  int max = 10
+  long max = 10
   def out = System.out
   private int lastStepAmount = -1
   private String lastLinePrinted = ""
   private String lastInfo = ""
   private long startTime
 
-  public void setMax(int max) {
+  public void setMax(long max) {
     this.max = Math.max(max, 1) }
 
-  void update(int value, String info) {
+  void update(long value, String info) {
     if (value == 0 || startTime == 0)
         startTime = System.currentTimeMillis()
 
@@ -43,8 +43,8 @@ class ConsoleProgressBar {
       remTime /= 1000
 
       def numEq = Math.max(curStep - 1, 0)
-      def remMin = curPercent < 0.05 ? '?' : (int) (remTime / 60)
-      def remSec = curPercent < 0.05 ? '?' : (int) (((remTime / 60.0) - remMin) * 60)
+      def remMin = curPercent < 0.05 ? '?' : (long) (remTime / 60)
+      def remSec = curPercent < 0.05 ? '?' : (long) (((remTime / 60.0) - remMin) * 60)
 
       lastInfo = info
       if (info.length() > 16) info = info[0..<16]
