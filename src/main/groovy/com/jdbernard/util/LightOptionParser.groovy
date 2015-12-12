@@ -170,12 +170,13 @@ public class LightOptionParser {
                 else {
                     if (!returnOpts.containsKey(optName))
                         returnOpts[optName] = []
-                    returnOpts[optName] += retVal
 
-                    if (optDef.longName) {
-                        if (!returnOpts.containsKey(optDef.longName))
-                            returnOpts[optDef.longName] = []
-                        returnOpts[optDef.longName] += retVal } } }
+                    if (optDef.arguments == 1) returnOpts[optName] += retVal
+                    else returnOpts[optName] << retVal
+
+
+                    if (optDef.longName)
+                        returnOpts[optDef.longName] = returnOpts[optName] } }
 
             /// This was not as option, it is an unclaomed argument.
             else { returnOpts.args << args[i]; i++ } }
