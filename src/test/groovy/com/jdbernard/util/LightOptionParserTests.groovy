@@ -58,8 +58,8 @@ public class LightOptionParserTests extends GroovyTestCase {
         assert opts.c  == ["cfgFile"]
         assert opts['config-file'] == ["cfgFile"]
         assert opts.args == ["arg1", "arg2"]
-        assert opts.i == ["in1", "in2", "in3", "in4"]
-        assert opts["input-file"] == ["in1", "in2", "in3", "in4"]
-        assert opts.o == ["out1", "out2"]
-        assert opts["output-file2"] == ["out1", "out2"] }
+        assert opts.i == [["in1", "in2", "in3"], ["in4"]]
+        assert opts["input-file"] == [["in1", "in2", "in3"], ["in4"]]
+        assert opts.o == [["out1", "out2"]]
+        assert opts["output-file2"] == [["out1", "out2"]] }
 }
